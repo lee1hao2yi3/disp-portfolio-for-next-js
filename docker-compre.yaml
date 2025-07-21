@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  # First instance of your portfolio
+  portfolio-1:
+    build: .
+    restart: always
+
+  # Second instance of your portfolio
+  portfolio-2:
+    build: .
+    restart: always
+
+  # The load balancer
+  load-balancer:
+    image: haproxy:2.8
+    restart: always
+    ports:
+      - "80:8080" # Map host port 80 to the container's port 8080
+    volumes:
+      # Mount the HAProxy configuration file
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - portfolio-1
+      - portfolio-2

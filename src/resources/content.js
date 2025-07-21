@@ -1,16 +1,16 @@
 import { Logo } from "@once-ui-system/core";
 
 const person = {
-  firstName: "Selene",
-  lastName: "Yu",
+  firstName: "Hao Yi",
+  lastName: "Lee",
   get name() {
     return `${this.firstName} ${this.lastName}`;
   },
-  role: "Design Engineer",
+  role: "Life Engineer",
   avatar: "/images/avatar.jpg",
-  email: "example@gmail.com",
-  location: "Asia/Jakarta", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
-  languages: ["English", "Bahasa"], // optional: Leave the array empty if you don't want to display languages
+  email: "lee1hao2yi3@gmail.com",
+  location: "Asia/Malaysia", // Expecting the IANA time zone identifier, e.g., 'Europe/Vienna'
+  languages: ["English", "Chinese", "Malay"], // optional: Leave the array empty if you don't want to display languages
 };
 
 const newsletter = {
@@ -30,17 +30,17 @@ const social = [
   {
     name: "GitHub",
     icon: "github",
-    link: "https://github.com/once-ui-system/nextjs-starter",
+    link: "https://github.com/lee1hao2yi3",
   },
   {
     name: "LinkedIn",
     icon: "linkedin",
-    link: "https://www.linkedin.com/company/once-ui/",
+    link: "https://www.linkedin.com/in/haoyilee99",
   },
   {
     name: "Threads",
     icon: "threads",
-    link: "https://www.threads.com/@once_ui",
+    link: "https://www.threads.com",
   },
   {
     name: "Email",
@@ -90,8 +90,8 @@ const about = {
     title: "Introduction",
     description: (
       <>
-        Selene is a Jakarta-based design engineer with a passion for transforming complex challenges
-        into simple, elegant design solutions. Her work spans digital interfaces, interactive
+        Hao Yi is a life enthusiast with a passion for transforming complex challenges
+        into simple, elegant design solutions. His work spans digital interfaces, interactive
         experiences, and the convergence of design and technology.
       </>
     ),
@@ -101,9 +101,9 @@ const about = {
     title: "Work Experience",
     experiences: [
       {
-        company: "FLY",
-        timeframe: "2022 - Present",
-        role: "Senior Design Engineer",
+        company: "MX",
+        timeframe: "2023 - Present",
+        role: "System Development and Support",
         achievements: [
           <>
             Redesigned the UI/UX for the FLY platform, resulting in a 20% increase in user
@@ -147,12 +147,12 @@ const about = {
     title: "Studies",
     institutions: [
       {
-        name: "University of Jakarta",
-        description: <>Studied software engineering.</>,
+        name: "Universiti Teknologi Malaysia",
+        description: <>Studied mechatronics engineering.</>,
       },
       {
         name: "Build the Future",
-        description: <>Studied online marketing and personal branding.</>,
+        description: <>Studied AI and machine learning.</>,
       },
     ],
   },
