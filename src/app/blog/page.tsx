@@ -84,7 +84,7 @@ export default async function Blog(props: {
                 fillWidth 
                 gap="8" 
                 marginTop="xl" 
-                marginBottom="xxl" 
+                marginBottom="xl" 
                 horizontal="center" 
                 vertical="center"
             >
