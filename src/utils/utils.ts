@@ -38,8 +38,8 @@ function readMDXFile(filePath: string) {
   return { metadata, content };
 }
 
-export function getPosts(customPath = ['src', 'posts']) {
-  // Use path.join with process.cwd() - this is the standard for Vercel
+// FIXED: Updated to look in 'public/posts'
+export function getPosts(customPath = ['public', 'posts']) {
   const postsDir = path.join(process.cwd(), ...customPath);
   
   const mdxFiles = getMDXFiles(postsDir);
@@ -50,7 +50,7 @@ export function getPosts(customPath = ['src', 'posts']) {
   });
 }
 
-export function debugFolder(customPath = ['src', 'posts']) {
+export function debugFolder(customPath = ['public', 'posts']) {
   const dir = path.join(process.cwd(), ...customPath);
   if (!fs.existsSync(dir)) return `Missing: ${dir}`;
   return fs.readdirSync(dir).join(", ") || "Empty";

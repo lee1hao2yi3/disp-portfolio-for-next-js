@@ -19,7 +19,7 @@ interface PostMetadata {
 }
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const posts = getPosts(["src", "posts"]);
+  const posts = getPosts(["public", "posts"]);
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -33,7 +33,7 @@ export async function generateMetadata({
   const routeParams = await params;
   const slugPath = Array.isArray(routeParams.slug) ? routeParams.slug.join('/') : routeParams.slug || '';
 
-  const posts = getPosts(["src", "posts"])
+  const posts = getPosts(["public", "posts"])
   const post = posts.find((p) => p.slug === slugPath);
 
   if (!post) return {};
@@ -55,7 +55,7 @@ export default async function Blog({
   const routeParams = await params;
   const slugPath = Array.isArray(routeParams.slug) ? routeParams.slug.join('/') : routeParams.slug || '';
 
-  const post = getPosts(["src", "posts"]).find((p) => p.slug === slugPath);
+  const post = getPosts(["public", "posts"]).find((p) => p.slug === slugPath);
 
   if (!post) {
     notFound();

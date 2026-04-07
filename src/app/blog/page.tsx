@@ -22,8 +22,8 @@ export default async function Blog(props: {
     const currentPage = parseInt(page || "1");
     const postsPerPage = 10;
 
-    const allPosts = getPosts(["src", "posts"]);
-    const folderContents = debugFolder(["src", "posts"]);
+    const allPosts = getPosts(["public", "posts"]);
+    const folderContents = debugFolder(["public", "posts"]);
 
     const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
     const start = (currentPage - 1) * postsPerPage + 1;
