@@ -22,16 +22,15 @@ export default async function Blog(props: {
     const currentPage = parseInt(page || "1");
     const postsPerPage = 10;
 
-    // SAFETY CHECK: Try to get posts. If folder is missing, don't crash.
+    // Fetch posts
     let allPosts = [];
     try {
         allPosts = getPosts(["src", "posts"]);
     } catch (e) {
-        console.error("Folder src/posts not found!");
+        console.error("Critical: Could not find src/posts directory");
     }
 
     const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
-
     const start = (currentPage - 1) * postsPerPage + 1;
     const end = currentPage * postsPerPage;
 
@@ -54,19 +53,38 @@ export default async function Blog(props: {
                 {blog.title}
             </Heading>
 
-            {allPosts.length === 0 ? (
-                <Text>No posts found in src/posts. Please check your folder name.</Text>
-            ) : (
+            {/* IF POSTS ARE FOUND */}
+            {allPosts.length > 0 ? (
                 <Column fillWidth flex={1} gap="m">
                     <Posts range={[start, end]} thumbnail direction="column"/>
                 </Column>
+            ) : (
+                /* DEBUGGER: This only shows if the list is empty */
+                <Column 
+                    background="neutral-alpha-medium" 
+                    padding="32" 
+                    radius="l" 
+                    border="neutral-alpha-weak"
+                    gap="12"
+                >
+                    <Text variant="body-strong-m" onBackground="danger-strong">
+                        ⚠️ No posts found on the server.
+                    </Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">
+                        The code is looking for: <b>/src/posts</b>
+                    </Text>
+                    <Text variant="body-default-s" onBackground="neutral-weak">
+                        Check if your filenames end in <b>.mdx</b> (lowercase) and that the folder name is exactly <b>posts</b>.
+                    </Text>
+                </Column>
             )}
 
+            {/* Pagination Jumper */}
             <Row 
                 fillWidth 
                 gap="8" 
                 marginTop="xl" 
-                marginBottom="xl" 
+                marginBottom="xxl" 
                 horizontal="center" 
                 vertical="center"
             >
