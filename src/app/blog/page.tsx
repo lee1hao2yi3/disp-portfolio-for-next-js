@@ -2,7 +2,7 @@ import { Column, Heading, Meta, Schema, Row, Button, Text } from "@once-ui-syste
 import { Mailchimp } from "@/components";
 import { Posts } from "@/components/blog/Posts";
 import { baseURL, blog, person, newsletter } from "@/resources";
-import { getPosts } from "@/utils/utils";
+import { getPosts, debugFolder } from "@/utils/utils";
 
 export async function generateMetadata() {
     return Meta.generate({
@@ -22,13 +22,8 @@ export default async function Blog(props: {
     const currentPage = parseInt(page || "1");
     const postsPerPage = 10;
 
-    // Fetch posts
-    let allPosts = [];
-    try {
-        allPosts = getPosts(["src", "posts"]);
-    } catch (e) {
-        console.error("Critical: Could not find src/posts directory");
-    }
+    const allPosts = getPosts(["src", "posts"]);
+    const folderContents = debugFolder(["src", "posts"]);
 
     const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
     const start = (currentPage - 1) * postsPerPage + 1;
@@ -53,41 +48,22 @@ export default async function Blog(props: {
                 {blog.title}
             </Heading>
 
-            {/* IF POSTS ARE FOUND */}
             {allPosts.length > 0 ? (
                 <Column fillWidth flex={1} gap="m">
                     <Posts range={[start, end]} thumbnail direction="column"/>
                 </Column>
             ) : (
-                /* DEBUGGER: This only shows if the list is empty */
-                <Column 
-                    background="neutral-alpha-medium" 
-                    padding="32" 
-                    radius="l" 
-                    border="neutral-alpha-weak"
-                    gap="12"
-                >
+                <Column background="neutral-alpha-medium" padding="32" radius="l" border="neutral-alpha-weak" gap="12">
                     <Text variant="body-strong-m" onBackground="danger-strong">
-                        ⚠️ No posts found on the server.
+                        ⚠️ No .mdx files detected.
                     </Text>
                     <Text variant="body-default-s" onBackground="neutral-weak">
-                        The code is looking for: <b>/src/posts</b>
-                    </Text>
-                    <Text variant="body-default-s" onBackground="neutral-weak">
-                        Check if your filenames end in <b>.mdx</b> (lowercase) and that the folder name is exactly <b>posts</b>.
+                        Server sees these files: <b>{folderContents}</b>
                     </Text>
                 </Column>
             )}
 
-            {/* Pagination Jumper */}
-            <Row 
-                fillWidth 
-                gap="8" 
-                marginTop="xl" 
-                marginBottom="xl" 
-                horizontal="center" 
-                vertical="center"
-            >
+            <Row fillWidth gap="8" marginTop="xl" marginBottom="xl" horizontal="center" vertical="center">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                     <Button
                         key={pageNum}

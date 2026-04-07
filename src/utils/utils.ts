@@ -19,15 +19,20 @@ type Metadata = {
   tag?: string;
   team: Team[];
   link?: string;
-  audio?: string;      // Added for music
-  audioTitle?: string; // Added for music
+  audio?: string;
+  audioTitle?: string;
 };
 
 function getMDXFiles(dir: string) {
   if (!fs.existsSync(dir)) {
+    console.error("Directory not found:", dir);
     return [];
   }
-  return fs.readdirSync(dir).filter((file) => path.extname(file).toLowerCase() === ".mdx");
+  
+  // This version is case-insensitive and more robust
+  return fs.readdirSync(dir).filter((file) => 
+    file.toLowerCase().endsWith(".mdx")
+  );
 }
 
 function readMDXFile(filePath: string) {
@@ -43,8 +48,8 @@ function readMDXFile(filePath: string) {
     tag: data.tag || "",
     team: data.team || [],
     link: data.link || "",
-    audio: data.audio || "",          // Maps audio from MDX
-    audioTitle: data.audioTitle || "", // Maps title from MDX
+    audio: data.audio || "",
+    audioTitle: data.audioTitle || "",
   };
 
   return { metadata, content };
@@ -55,11 +60,24 @@ function getMDXData(dir: string) {
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file));
     const slug = path.basename(file, path.extname(file));
-    return { metadata, slug, content };
+
+    return {
+      metadata,
+      slug,
+      content,
+    };
   });
 }
 
 export function getPosts(customPath = ["src", "posts"]) {
-  const postsDir = path.join(process.cwd(), ...customPath);
+  // We use path.resolve to ensure we start from the project root on Vercel
+  const postsDir = path.resolve(process.cwd(), ...customPath);
   return getMDXData(postsDir);
+}
+
+// Added this helper so the Blog page can debug the folder
+export function debugFolder(customPath = ["src", "posts"]) {
+  const dir = path.resolve(process.cwd(), ...customPath);
+  if (!fs.existsSync(dir)) return `Folder ${dir} does not exist.`;
+  return fs.readdirSync(dir).join(", ") || "Folder is empty.";
 }
