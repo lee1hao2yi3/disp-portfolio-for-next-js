@@ -22,6 +22,7 @@ import {
   Media,
   SmartLink,
 } from "@once-ui-system/core";
+import { YouTube } from "./blog/YouTube";
 
 type CustomLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
@@ -179,6 +180,7 @@ const components = {
   Icon,
   Media,
   SmartLink,
+  YouTube,
 };
 
 type CustomMDXProps = MDXRemoteProps & {
