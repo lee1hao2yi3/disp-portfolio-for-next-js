@@ -1,14 +1,6 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { notFound } from 'next/navigation';
-
-type Team = {
-  name: string;
-  role: string;
-  avatar: string;
-  linkedIn: string;
-};
 
 type Metadata = {
   title: string;
@@ -17,28 +9,20 @@ type Metadata = {
   image?: string;
   images: string[];
   tag?: string;
-  team: Team[];
+  team: any[];
   link?: string;
   audio?: string;
   audioTitle?: string;
 };
 
 function getMDXFiles(dir: string) {
-  if (!fs.existsSync(dir)) {
-    console.error("Directory not found:", dir);
-    return [];
-  }
-  
-  // This version is case-insensitive and more robust
-  return fs.readdirSync(dir).filter((file) => 
-    file.toLowerCase().endsWith(".mdx")
-  );
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir).filter((file) => file.toLowerCase().endsWith(".mdx"));
 }
 
 function readMDXFile(filePath: string) {
   const rawContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(rawContent);
-
   const metadata: Metadata = {
     title: data.title || "",
     publishedAt: data.publishedAt || "",
@@ -51,33 +35,23 @@ function readMDXFile(filePath: string) {
     audio: data.audio || "",
     audioTitle: data.audioTitle || "",
   };
-
   return { metadata, content };
 }
 
-function getMDXData(dir: string) {
-  const mdxFiles = getMDXFiles(dir);
+export function getPosts(customPath = ['src', 'posts']) {
+  // Use path.join with process.cwd() - this is the standard for Vercel
+  const postsDir = path.join(process.cwd(), ...customPath);
+  
+  const mdxFiles = getMDXFiles(postsDir);
   return mdxFiles.map((file) => {
-    const { metadata, content } = readMDXFile(path.join(dir, file));
+    const { metadata, content } = readMDXFile(path.join(postsDir, file));
     const slug = path.basename(file, path.extname(file));
-
-    return {
-      metadata,
-      slug,
-      content,
-    };
+    return { metadata, slug, content };
   });
 }
 
-export function getPosts(customPath = ["src", "posts"]) {
-  // We use path.resolve to ensure we start from the project root on Vercel
-  const postsDir = path.resolve(process.cwd(), ...customPath);
-  return getMDXData(postsDir);
-}
-
-// Added this helper so the Blog page can debug the folder
-export function debugFolder(customPath = ["src", "posts"]) {
-  const dir = path.resolve(process.cwd(), ...customPath);
-  if (!fs.existsSync(dir)) return `Folder ${dir} does not exist.`;
-  return fs.readdirSync(dir).join(", ") || "Folder is empty.";
+export function debugFolder(customPath = ['src', 'posts']) {
+  const dir = path.join(process.cwd(), ...customPath);
+  if (!fs.existsSync(dir)) return `Missing: ${dir}`;
+  return fs.readdirSync(dir).join(", ") || "Empty";
 }

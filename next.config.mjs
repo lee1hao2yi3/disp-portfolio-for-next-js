@@ -13,6 +13,13 @@ const nextConfig = {
     compiler: "modern",
     silenceDeprecations: ["legacy-js-api"],
   },
+  // FIXED: This forces Vercel to include your 'posts' folder in the serverless function
+  experimental: {
+    outputFileTracingIncludes: {
+      '/blog': ['./src/posts/**/*'],
+      '/blog/*': ['./src/posts/**/*'],
+    },
+  },
 };
 
 export default withMDX(nextConfig);
