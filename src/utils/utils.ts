@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { notFound } from 'next/navigation';
 
 type Team = {
   name: string;
@@ -9,7 +10,6 @@ type Team = {
   linkedIn: string;
 };
 
-// 1. Added 'audio' to the Metadata type here
 type Metadata = {
   title: string;
   publishedAt: string;
@@ -19,29 +19,21 @@ type Metadata = {
   tag?: string;
   team: Team[];
   link?: string;
-  audio?: string; 
-  audioTitle?: string; 
+  audio?: string;      // Added for music
+  audioTitle?: string; // Added for music
 };
-
-import { notFound } from 'next/navigation';
 
 function getMDXFiles(dir: string) {
   if (!fs.existsSync(dir)) {
-    notFound();
+    return [];
   }
-
-  return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
+  return fs.readdirSync(dir).filter((file) => path.extname(file).toLowerCase() === ".mdx");
 }
 
 function readMDXFile(filePath: string) {
-    if (!fs.existsSync(filePath)) {
-        notFound();
-    }
-
   const rawContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(rawContent);
 
-  // 2. Map the 'audio' field from your MDX file to the metadata object
   const metadata: Metadata = {
     title: data.title || "",
     publishedAt: data.publishedAt || "",
@@ -51,8 +43,8 @@ function readMDXFile(filePath: string) {
     tag: data.tag || "",
     team: data.team || [],
     link: data.link || "",
-    audio: data.audio || "", // <--- ADDED THIS
-    audioTitle: data.audioTitle || "", // ADD THIS
+    audio: data.audio || "",          // Maps audio from MDX
+    audioTitle: data.audioTitle || "", // Maps title from MDX
   };
 
   return { metadata, content };
@@ -63,12 +55,7 @@ function getMDXData(dir: string) {
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file));
     const slug = path.basename(file, path.extname(file));
-
-    return {
-      metadata,
-      slug,
-      content,
-    };
+    return { metadata, slug, content };
   });
 }
 
