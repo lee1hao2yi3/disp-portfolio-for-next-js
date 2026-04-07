@@ -4,10 +4,22 @@ import { Meta, Schema, AvatarGroup, Button, Column, Heading, HeadingNav, Icon, R
 import { baseURL, about, blog, person } from "@/resources";
 import { formatDate } from "@/utils/formatDate";
 import { getPosts } from "@/utils/utils";
-import { Metadata } from 'next';
+import { Metadata as NextMetadata } from 'next';
+import { BackgroundMusic } from "@/components/blog/BackgroundMusic";
+
+interface PostMetadata {
+  title: string;
+  publishedAt: string;
+  summary: string;
+  image?: string;
+  audio?: string;
+  audioTitle?: string;
+  tag?: string;
+  team?: Array<{ name: string; avatar: string }>;
+}
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const posts = getPosts(["src", "app", "blog", "posts"]);
+  const posts = getPosts(["src", "posts"]);
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -17,20 +29,22 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string | string[] }>;
-}): Promise<Metadata> {
+}): Promise<NextMetadata> {
   const routeParams = await params;
   const slugPath = Array.isArray(routeParams.slug) ? routeParams.slug.join('/') : routeParams.slug || '';
 
-  const posts = getPosts(["src", "app", "blog", "posts"])
-  let post = posts.find((post) => post.slug === slugPath);
+  const posts = getPosts(["src", "posts"])
+  const post = posts.find((p) => p.slug === slugPath);
 
   if (!post) return {};
 
+  const metadata = post.metadata as PostMetadata;
+
   return Meta.generate({
-    title: post.metadata.title,
-    description: post.metadata.summary,
+    title: metadata.title,
+    description: metadata.summary,
     baseURL: baseURL,
-    image: post.metadata.image || `/api/og/generate?title=${post.metadata.title}`,
+    image: metadata.image || `/api/og/generate?title=${metadata.title}`,
     path: `${blog.path}/${post.slug}`,
   });
 }
@@ -41,14 +55,16 @@ export default async function Blog({
   const routeParams = await params;
   const slugPath = Array.isArray(routeParams.slug) ? routeParams.slug.join('/') : routeParams.slug || '';
 
-  let post = getPosts(["src", "app", "blog", "posts"]).find((post) => post.slug === slugPath);
+  const post = getPosts(["src", "posts"]).find((p) => p.slug === slugPath);
 
   if (!post) {
     notFound();
   }
 
+  const metadata = post.metadata as PostMetadata;
+
   const avatars =
-    post.metadata.team?.map((person) => ({
+    metadata.team?.map((person) => ({
       src: person.avatar,
     })) || [];
 
@@ -61,46 +77,60 @@ export default async function Blog({
             as="blogPosting"
             baseURL={baseURL}
             path={`${blog.path}/${post.slug}`}
-            title={post.metadata.title}
-            description={post.metadata.summary}
-            datePublished={post.metadata.publishedAt}
-            dateModified={post.metadata.publishedAt}
-            image={post.metadata.image || `/api/og/generate?title=${encodeURIComponent(post.metadata.title)}`}
+            title={metadata.title}
+            description={metadata.summary}
+            datePublished={metadata.publishedAt}
+            dateModified={metadata.publishedAt}
+            image={metadata.image || `/api/og/generate?title=${encodeURIComponent(metadata.title)}`}
             author={{
               name: person.name,
               url: `${baseURL}${about.path}`,
               image: `${baseURL}${person.avatar}`,
             }}
           />
+          
           <Button data-border="rounded" href="/blog" weight="default" variant="tertiary" size="s" prefixIcon="chevronLeft">
             Posts
           </Button>
-          <Heading variant="display-strong-s">{post.metadata.title}</Heading>
+
+          {/* BACKGROUND MUSIC PLAYER */}
+          {metadata.audio && (
+              <BackgroundMusic 
+                url={metadata.audio} 
+                title={metadata.audioTitle} 
+              />
+          )}
+
+          <Heading variant="display-strong-s">{metadata.title}</Heading>
+          
           <Row gap="12" vertical="center">
             {avatars.length > 0 && <AvatarGroup size="s" avatars={avatars} />}
             <Text variant="body-default-s" onBackground="neutral-weak">
-              {post.metadata.publishedAt && formatDate(post.metadata.publishedAt)}
+              {metadata.publishedAt && formatDate(metadata.publishedAt)}
             </Text>
           </Row>
+
           <Column as="article" fillWidth>
             <CustomMDX source={post.content} />
           </Column>
+
           <ScrollToHash />
         </Column>
-    </Row>
-    <Column maxWidth={12} paddingLeft="40" fitHeight position="sticky" top="80" gap="16" hide="m">
-      <Row
-        gap="12"
-        paddingLeft="2"
-        vertical="center"
-        onBackground="neutral-medium"
-        textVariant="label-default-s"
-      >
-        <Icon name="document" size="xs" />
-        On this page
       </Row>
-      <HeadingNav fitHeight/>
-    </Column>
+
+      <Column maxWidth={12} paddingLeft="40" fitHeight position="sticky" top="80" gap="16" hide="m">
+        <Row
+          gap="12"
+          paddingLeft="2"
+          vertical="center"
+          onBackground="neutral-medium"
+          textVariant="label-default-s"
+        >
+          <Icon name="document" size="xs" />
+          On this page
+        </Row>
+        <HeadingNav fitHeight/>
+      </Column>
     </Row>
   );
 }

@@ -9,6 +9,7 @@ type Team = {
   linkedIn: string;
 };
 
+// 1. Added 'audio' to the Metadata type here
 type Metadata = {
   title: string;
   publishedAt: string;
@@ -18,6 +19,8 @@ type Metadata = {
   tag?: string;
   team: Team[];
   link?: string;
+  audio?: string; 
+  audioTitle?: string; 
 };
 
 import { notFound } from 'next/navigation';
@@ -38,15 +41,18 @@ function readMDXFile(filePath: string) {
   const rawContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(rawContent);
 
+  // 2. Map the 'audio' field from your MDX file to the metadata object
   const metadata: Metadata = {
     title: data.title || "",
-    publishedAt: data.publishedAt,
+    publishedAt: data.publishedAt || "",
     summary: data.summary || "",
     image: data.image || "",
     images: data.images || [],
-    tag: data.tag || [],
+    tag: data.tag || "",
     team: data.team || [],
     link: data.link || "",
+    audio: data.audio || "", // <--- ADDED THIS
+    audioTitle: data.audioTitle || "", // ADD THIS
   };
 
   return { metadata, content };

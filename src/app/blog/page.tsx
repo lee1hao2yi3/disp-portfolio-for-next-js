@@ -1,20 +1,37 @@
-import { Column, Heading, Meta, Schema, Row, Button } from "@once-ui-system/core";
+import { Column, Heading, Meta, Schema, Row, Button, Text } from "@once-ui-system/core";
 import { Mailchimp } from "@/components";
 import { Posts } from "@/components/blog/Posts";
 import { baseURL, blog, person, newsletter } from "@/resources";
+import { getPosts } from "@/utils/utils";
 
-// ... keep your generateMetadata function as is ...
+export async function generateMetadata() {
+    return Meta.generate({
+        title: blog.title,
+        description: blog.description,
+        baseURL: baseURL,
+        image: `/api/og/generate?title=${encodeURIComponent(blog.title)}`,
+        path: blog.path,
+    });
+}
 
-export default async function Blog({ 
-    searchParams 
-}: { 
+export default async function Blog(props: { 
     searchParams: Promise<{ page?: string }> 
 }) {
-    const { page } = await searchParams;
+    const searchParams = await props.searchParams;
+    const page = searchParams.page;
     const currentPage = parseInt(page || "1");
     const postsPerPage = 10;
 
-    // Calculate the range (e.g. Page 1: [1, 10], Page 2: [11, 20])
+    // SAFETY CHECK: Try to get posts. If folder is missing, don't crash.
+    let allPosts = [];
+    try {
+        allPosts = getPosts(["src", "posts"]);
+    } catch (e) {
+        console.error("Folder src/posts not found!");
+    }
+
+    const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
+
     const start = (currentPage - 1) * postsPerPage + 1;
     const end = currentPage * postsPerPage;
 
@@ -37,25 +54,31 @@ export default async function Blog({
                 {blog.title}
             </Heading>
 
-            {/* The Blog List */}
-            <Column fillWidth flex={1} gap="m">
-                <Posts range={[start, end]} thumbnail direction="column"/>
-            </Column>
+            {allPosts.length === 0 ? (
+                <Text>No posts found in src/posts. Please check your folder name.</Text>
+            ) : (
+                <Column fillWidth flex={1} gap="m">
+                    <Posts range={[start, end]} thumbnail direction="column"/>
+                </Column>
+            )}
 
-            {/* Pagination Buttons */}
-            <Row fillWidth gap="m" marginTop="xl" horizontal="center">
-                {currentPage > 1 && (
-                    <Button 
-                        href={`/blog?page=${currentPage - 1}`} 
-                        variant="secondary" 
-                        label="Previous" 
+            <Row 
+                fillWidth 
+                gap="8" 
+                marginTop="xl" 
+                marginBottom="xl" 
+                horizontal="center" 
+                vertical="center"
+            >
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <Button
+                        key={pageNum}
+                        href={`/blog?page=${pageNum}`}
+                        variant={currentPage === pageNum ? "secondary" : "tertiary"}
+                        size="s"
+                        label={pageNum.toString()}
                     />
-                )}
-                <Button 
-                    href={`/blog?page=${currentPage + 1}`} 
-                    variant="secondary" 
-                    label="Next" 
-                />
+                ))}
             </Row>
 
             {newsletter.display && <Mailchimp newsletter={newsletter} />}
