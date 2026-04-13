@@ -65,9 +65,12 @@ function createImage({ alt, src, ...props }: MediaProps & { src: string }) {
       marginBottom="16"
       enlarge
       radius="m"
-      aspectRatio="16 / 9"
+// REMOVED: aspectRatio="16 / 9" (This was causing the crop)
+      // ADDED: width and height auto behavior
+      style={{ width: '100%', height: 'auto' }} 
       border="neutral-alpha-medium"
-      sizes="(max-width: 960px) 100vw, 960px"
+      // For Full HD clarity, we tell the browser to expect a larger image
+      sizes="(max-width: 1200px) 100vw, 1200px"
       alt={alt}
       src={src}
       {...props}
