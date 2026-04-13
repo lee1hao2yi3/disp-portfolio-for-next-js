@@ -7,6 +7,9 @@ const withMDX = mdx({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+        unoptimized: true, // This keeps images exactly as you uploaded them
+    },
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   transpilePackages: ["next-mdx-remote"],
   sassOptions: {
