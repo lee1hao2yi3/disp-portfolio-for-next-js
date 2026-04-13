@@ -53,26 +53,34 @@ function CustomLink({ href, children, ...props }: CustomLinkProps) {
   );
 }
 
-function createImage({ alt, src, ...props }: MediaProps & { src: string }) {
+function createImage({ alt, src }: { alt?: string; src: string }) {
   if (!src) {
     console.error("Media requires a valid 'src' property.");
     return null;
   }
 
   return (
-    <Media
-      marginTop="8"
-      marginBottom="16"
-      enlarge
-      radius="m"
-      // aspectRatio="16 / 9"
-      style={{ width: '100%', height: 'auto' }}
-      border="neutral-alpha-medium"
-      sizes="(max-width: 960px) 100vw, 960px"
-      alt={alt}
-      src={src}
-      {...props}
-    />
+    <Column 
+        fillWidth 
+        marginTop="8" 
+        marginBottom="16" 
+        radius="m" 
+        border="neutral-alpha-medium" 
+        style={{ overflow: 'hidden' }}
+    >
+      <img
+        src={src}
+        alt={alt || ""}
+        style={{
+          width: '100%',
+          height: 'auto', // This allows portrait/landscape to show fully
+          display: 'block',
+          objectFit: 'contain',
+        }}
+        // This ensures the browser pulls the high-quality version
+        loading="lazy"
+      />
+    </Column>
   );
 }
 
